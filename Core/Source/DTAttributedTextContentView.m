@@ -26,7 +26,8 @@
 
 NSString * const DTAttributedTextContentViewDidFinishLayoutNotification = @"DTAttributedTextContentViewDidFinishLayoutNotification";
 
-@interface DTAttributedTextContentView () <DTAccessibilityViewProxyDelegate>
+//@interface DTAttributedTextContentView () <DTAccessibilityViewProxyDelegate>
+@interface DTAttributedTextContentView ()
 {
 	BOOL _shouldAddFirstLineLeading;
 	BOOL _shouldDrawImages;
@@ -36,14 +37,14 @@ NSString * const DTAttributedTextContentViewDidFinishLayoutNotification = @"DTAt
 	
 	NSMutableSet *customViews;
 	NSMutableDictionary *customViewsForLinksIndex;
-    
+	
 	BOOL _isTiling;
 	BOOL _layoutFrameHeightIsConstrainedByBounds;
 	
 	DTCoreTextLayouter *_layouter;
 	
 	CGPoint _layoutOffset;
-    CGSize _backgroundOffset;
+	CGSize _backgroundOffset;
 	
 	// lookup bitmask what delegate methods are implemented
 	struct
@@ -447,7 +448,7 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 		[self layoutSubviewsInRect:CGRectInfinite];
 	}
   
-    [super layoutSubviews];
+	[super layoutSubviews];
 }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx
@@ -535,7 +536,7 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 			
 			if ([strongSelf respondsToSelector:@selector(invalidateIntrinsicContentSize)])
 			{
-            	[strongSelf invalidateIntrinsicContentSize];
+				[strongSelf invalidateIntrinsicContentSize];
 			}
 		}
 	});
@@ -589,11 +590,11 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 
 - (void)setBounds:(CGRect)bounds {
 
-    if (!CGSizeEqualToSize(self.bounds.size, bounds.size)) {
-        _layoutFrame = nil;
-        [self invalidateIntrinsicContentSize];
-    }
-    [super setBounds:bounds];
+	if (!CGSizeEqualToSize(self.bounds.size, bounds.size)) {
+		_layoutFrame = nil;
+		[self invalidateIntrinsicContentSize];
+	}
+	[super setBounds:bounds];
 }
 
 - (CGSize)intrinsicContentSize
@@ -918,7 +919,7 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 					}];
 				}
 
-				[self invalidateAccessibilityElements];
+//				[self invalidateAccessibilityElements];
 			}
 		}
 	
@@ -941,7 +942,7 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 			}
 			_layoutFrame = layoutFrame;
 			
-			[self invalidateAccessibilityElements];
+//			[self invalidateAccessibilityElements];
 		}
 	};
 }
@@ -1004,70 +1005,70 @@ static Class _layerClassToUseForDTAttributedTextContentView = nil;
 	}
 }
 
-#pragma mark - Accessibility
+//#pragma mark - Accessibility
+//
+//- (void)invalidateAccessibilityElements
+//{
+//	_accessibilityElements = nil;
+//}
+//
+//- (BOOL)isAccessibilityElement
+//{
+//	return NO;
+//}
+//
+//- (NSInteger)accessibilityElementCount
+//{
+//	return [[self accessibilityElements] count];
+//}
+//
+//- (id)accessibilityElementAtIndex:(NSInteger)index
+//{
+//	NSUInteger count = [self accessibilityElementCount];
+//
+//	if (count > 0 && index < count)
+//	{
+//		return [[self accessibilityElements] objectAtIndex:index];
+//	}
+//
+//	return nil;
+//}
+//
+//- (NSInteger)indexOfAccessibilityElement:(id)element
+//{
+//	// It seems like indexOfObject: is failing for the proxy views, even though isEqual: and hash are both implemented
+//	// on the proxy.  Perhaps UIView doesn't like isEqual: with our proxy view.  Regardless, this implementation seems to work.
+//	NSInteger index = [[self accessibilityElements] indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+//		BOOL equal = [obj isEqual:element];
+//		*stop = equal;
+//		return equal;
+//	}];
+//
+//	return index;
+//}
 
-- (void)invalidateAccessibilityElements
-{
-	_accessibilityElements = nil;
-}
-
-- (BOOL)isAccessibilityElement
-{
-	return NO;
-}
-
-- (NSInteger)accessibilityElementCount
-{
-	return [[self accessibilityElements] count];
-}
-
-- (id)accessibilityElementAtIndex:(NSInteger)index
-{
-	NSUInteger count = [self accessibilityElementCount];
-	
-	if (count > 0 && index < count)
-	{
-		return [[self accessibilityElements] objectAtIndex:index];
-	}
-	
-	return nil;
-}
-
-- (NSInteger)indexOfAccessibilityElement:(id)element
-{
-	// It seems like indexOfObject: is failing for the proxy views, even though isEqual: and hash are both implemented
-	// on the proxy.  Perhaps UIView doesn't like isEqual: with our proxy view.  Regardless, this implementation seems to work.
-	NSInteger index = [[self accessibilityElements] indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
-		BOOL equal = [obj isEqual:element];
-		*stop = equal;
-		return equal;
-	}];
-
-	return index;
-}
-
-- (NSArray *)accessibilityElements
-{
-	if (!_accessibilityElements)
-	{
-		DTCoreTextLayoutFrameAccessibilityElementGenerator *generator = [[DTCoreTextLayoutFrameAccessibilityElementGenerator alloc] init];
-		_accessibilityElements = [generator accessibilityElementsForLayoutFrame:self.layoutFrame view:self attachmentViewProvider:^id(DTTextAttachment *attachment) {
-			// Since we actually take the views out of the view hierarchy when they're off screen, create a proxy object that stands
-			// in for the view until it's needed by VoiceOver.  By the time VoiceOver asks for the view, it should already be onscreen.
-			return [[DTAccessibilityViewProxy alloc] initWithTextAttachment:attachment delegate:self];
-		}];
-	}
-	return _accessibilityElements;
-}
+//- (NSArray *)accessibilityElements
+//{
+//	if (!_accessibilityElements)
+//	{
+//		DTCoreTextLayoutFrameAccessibilityElementGenerator *generator = [[DTCoreTextLayoutFrameAccessibilityElementGenerator alloc] init];
+//		_accessibilityElements = [generator accessibilityElementsForLayoutFrame:self.layoutFrame view:self attachmentViewProvider:^id(DTTextAttachment *attachment) {
+//			// Since we actually take the views out of the view hierarchy when they're off screen, create a proxy object that stands
+//			// in for the view until it's needed by VoiceOver.  By the time VoiceOver asks for the view, it should already be onscreen.
+//			return [[DTAccessibilityViewProxy alloc] initWithTextAttachment:attachment delegate:self];
+//		}];
+//	}
+//	return _accessibilityElements;
+//}
 
 #pragma mark - DTAccessibilityViewProxyDelegate
-
-- (UIView *)viewForTextAttachment:(DTTextAttachment *)textAttachment proxy:(DTAccessibilityViewProxy *)proxy
-{
-	NSNumber *indexKey = [NSNumber numberWithInteger:[textAttachment hash]];
-	UIView *existingAttachmentView = [self.customViewsForAttachmentsIndex objectForKey:indexKey];
-	return existingAttachmentView;
-}
+//
+//- (UIView *)viewForTextAttachment:(DTTextAttachment *)textAttachment proxy:(DTAccessibilityViewProxy *)proxy
+//{
+//	NSNumber *indexKey = [NSNumber numberWithInteger:[textAttachment hash]];
+//	UIView *existingAttachmentView = [self.customViewsForAttachmentsIndex objectForKey:indexKey];
+//	return existingAttachmentView;
+//}
 
 @synthesize layouter = _layouter;
 @synthesize layoutFrame = _layoutFrame;
